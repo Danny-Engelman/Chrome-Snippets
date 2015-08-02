@@ -165,13 +165,20 @@ Example code:
 						}
 					}
 			}
-//            if(_traceREST){consoleinfo('response',_SPtype,data.TypeAsString,_listGUID,data.url,data);}
 
             if(_SPtype==='RegionalSettings'){
 				_SPOM[ _WebId ][_SPtype]=data;
             }
+            consoleinfo('response',_SPtype,data.TypeAsString,_listGUID,data.url,data);
+            if(_SPtype==='Data'){
+            if(_traceREST){consoleinfo('response',_SPtype,data.TypeAsString,_listGUID,data.url,data);}
+                if(!_SPOM[ _WebId ].hasOwnProperty(_SPtype)){
+                    _SPOM[ _WebId ][_SPtype]=[];
+                }
+				_SPOM[ _WebId ][_SPtype].push(data);
+            }
 			//for all Fields found
-            if(_SPtype.indexOf('Field')===0){
+            if(_SPtype.indexOf('Field')===0){//starts with Field
 
 				//reformat the Choices
                 if(data.hasOwnProperty('Choices')){
@@ -214,7 +221,7 @@ Example code:
                     case('FieldLookup'):
                         break;
                     case('FieldChoice'):
-                    console.log(data.Title,data.Choices.results);
+                    //console.log(data.Title,data.Choices.results);
                         break;
                     case('FieldMultiChoice'):
                         break;
@@ -446,13 +453,14 @@ console.info(_startUrl,_properties);
 			//console.log('progress',_data);
 		};
 		var hostWeb = new SPOMinspector( { RESTendpoint:['/Web']
-											,traceREST:true
+											,traceREST:false
 											, cleanresponse:false
 											, filterLists:false//['VM Taken','Tasks','Documents','Second TaskList']
 											, Types:{
 														Callback:SPOMprogress
 														,Web:{ Properties:['RegionalSettings','Lists'] , Callback:false }
-														,List:{ Properties:['Fields','Views'] , 
+														,List:{ Properties:['Items'] , 
+//														,List:{ Properties:['Fields','Views','Items'] , 
 														Callback:false }
 														,View:{ Properties:[] , Callback:false}
 														,Field:{ Properties:[] , Callback:false}
